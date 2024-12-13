@@ -11,8 +11,7 @@ const addUserdb = async (data) => {
     const ref = await setDoc(doc(db,'users',userId),{userId,name:data.name,email}) 
     return {status:"user added successfully"}
   } catch (error) {
-    console.log(error)
-    return 'Failed to add a user'
+    throw new Error(error)
   }
 }
 const login = async (data) => {
@@ -22,13 +21,28 @@ const login = async (data) => {
     await setPersistence(auth, browserLocalPersistence)
     const userCredential = await signInWithEmailAndPassword(auth,email,password)
     const user = userCredential?.user
-    console.log(user)
     return userCredential
   } catch (error) {
-    console.log(error.message)
     throw new Error(error)
   }
 }
+const refreshAuth = async () => { 
+
+  try {
+    let t = ''
+    auth.onAuthStateChanged(async(user)=>{
+      const token = await user?.getIdToken()
+      console.log("token",token)
+      t = token
+      return token
+    })
+    return t
+  } catch (error) {
+    console.log(error.message)
+    return error
+  }
+}
+
 const loginOut = async () => {
   try {
     await signOut(auth)
@@ -82,4 +96,4 @@ const getUserdb = async (userId) => {
   }
 }
 
-module.exports = {addUserdb,getUsersdb,editUserdb,deleteUserdb,getUserdb,login,loginOut}
+module.exports = {addUserdb,getUsersdb,editUserdb,deleteUserdb,getUserdb,login,loginOut,refreshAuth}

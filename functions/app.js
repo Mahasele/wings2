@@ -3,6 +3,7 @@ const cors = require('cors')
 const cookieParser = require("cookie-parser")
 const productRouter = require('../routes/products')
 const userRouter = require('../routes/users')
+const Serverless = require("serverless-http")
 const port = process.env.PORT || 4000
 
 
@@ -16,7 +17,7 @@ app.use(productRouter)
 app.use(userRouter)
 
 
-app.get('/',(req, res)=>{
+app.get('/.netlify/functions/app/',(req, res)=>{
     res.send(`Hello, i am running on port ${port}...`)
 })
 
@@ -27,4 +28,4 @@ app.all("*",(req,res)=>{
 })
 
 app.listen(port,console.log(`Running on port ${port}...`))
-module.exports.handler = serverless(app);
+module.exports.handler = Serverless(app);

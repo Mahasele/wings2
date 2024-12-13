@@ -1,5 +1,6 @@
 
 const { auth } = require("../firebase")
+const { getUserdb } = require("../models/users/users")
 module.exports = async(req,res,next)=>{
     const headToken = req.headers.authorization || req.headers.Authorization
 
@@ -10,9 +11,19 @@ module.exports = async(req,res,next)=>{
     if(!token) return res.sendStatus(401)
     
     try {
-        const to = auth.currentUser?.stsTokenManager?.accessToken
+        const user = auth.currentUser
+        const to = await auth.currentUser?.getIdToken()
         if (to !== token) return res.sendStatus(403)
-        next()
+        if (user) {
+            const loggedUser = await getUserdb(user.uid)
+            req.user = loggedUser
+            req.token = to 
+            next()
+            return
+        }
+      req.token = ''
+      req.user = {}
+      next()
     } catch (error) {
         console.log("auth",error)
         return res.sendStatus(401)

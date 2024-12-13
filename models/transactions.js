@@ -1,4 +1,4 @@
-const { collection, addDoc, setDoc, getDocs, updateDoc, doc, deleteDoc, getDoc } = require('firebase/firestore');
+const { collection, addDoc, setDoc, getDocs, updateDoc, doc, deleteDoc, getDoc, query, where } = require('firebase/firestore');
 const {db} = require('../firebase')
 const addTransactiondb = async (data) => {
   try {
@@ -18,8 +18,7 @@ const getTransactionsdb = async (userId) => {
   try {
     if(!userId) return "Missing info"
 
-    const ref = await getDocs(collection(db,'transaction')) 
-
+    const ref = await getDocs(query(collection(db,'transactions'),where('userId','==',userId))) 
     return ref.docs.map(doc=>doc.data()) || []
   } catch (error) {
     console.log(error)
